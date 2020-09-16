@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 public class A_star
 {
@@ -18,7 +19,7 @@ public class A_star
             }
         }
         open_Parts.clear();
-        return find_way(from, to);
+        return algoritm.type_algo == 0 ? find_way(from, to) : algoritm.type_algo == 1 ? find_way_wave(from, to, from.value) : find_way_greedy(from, to);
     }
 
     public static boolean find_way(Part from, Part to)
@@ -44,7 +45,6 @@ public class A_star
                 part.open = true;
                 open_Parts.add(part);
             }
-
         }
         if (from.open)
         {
@@ -63,12 +63,87 @@ public class A_star
                 if (open_Parts.get(i).weight < open_Parts.get(index).weight)
                     index = i;
         }
-//        algoritm.print_field();
-//        try{
-//            Thread.sleep(200);
-//        }catch(Exception ex){}
+        if (algoritm.type_output == 2)
+            algoritm.print_field();
 
         return find_way(open_Parts.get(index), to);
+    }
+
+    public static boolean   find_way_wave(Part from, Part to, int value)
+    {
+        if (from.equals(to))
+            return true;
+
+        for (Part part : from.getNear())
+        {
+            if (part.close || part.block || part.move)
+                continue ;
+            if (part.dir == null)
+                part.dir = from;
+            if (!part.open)
+            {
+                part.open = true;
+                open_Parts.add(part);
+            }
+        }
+        if (from.open)
+        {
+            open_Parts.remove(from);
+            from.open = false;
+        }
+        from.close = true;
+        if (open_Parts.size() == 0)
+            return false;
+        if (algoritm.type_output == 2)
+            algoritm.print_field();
+
+        return find_way_wave(open_Parts.get(0), to, value);
+    }
+
+    public static boolean find_way_greedy(Part from, Part to)
+    {
+        if (from.equals(to))
+            return true;
+
+        ArrayList<Part> open_Parts = new ArrayList<>();
+
+        for (Part part : from.getNear())
+        {
+            if (part.close || part.block || part.move)
+                continue ;
+            if (part.dir == null)
+                part.dir = from;
+            if (part.weight == 0)
+                part.weight = part.distance(to);
+            else if (part.weight > part.distance(to))
+            {
+                part.weight = part.distance(to);
+                part.dir = from;
+            }
+            if (!open_Parts.contains(part))
+            {
+                part.open = true;
+                open_Parts.add(part);
+            }
+        }
+        if (from.open)
+        {
+            open_Parts.remove(from);
+            from.open = false;
+        }
+        from.close = true;
+        if (open_Parts.size() == 0)
+            return false;
+        open_Parts.sort(Comparator.comparingInt(a -> a.weight));
+        if (algoritm.type_output == 2)
+            algoritm.print_field();
+
+        for (Part part : open_Parts)
+        {
+            if (find_way_greedy(part, to))
+                return true;
+        }
+        return false;
     }
 
     public static ArrayList<Integer> getWay(Part from, Part to)

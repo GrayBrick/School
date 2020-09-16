@@ -63,7 +63,8 @@ public class Part
         this.position = zero.position;
         zero.position = buf;
         all_move++;
-        algoritm.print_field();
+        if (algoritm.type_output != 0)
+            algoritm.print_field();
         return true;
     }
 
@@ -86,7 +87,18 @@ public class Part
     {
         if (value == 1)
             return new int[]{0,0};
-        return algoritm.getFirstClockWise(Part.get_part(value - 1)).position;
+        if (value == 0)
+            return position;
+        Part ret_pos = algoritm.build_type == 0 ?
+                algoritm.getFirstClockWise(
+                        Part.get_part(value - 1)
+                ) :
+                algoritm.getFirstCounterClockWise(
+                        Part.get_part(value - 1)
+                );
+        if (ret_pos != null)
+            return ret_pos.position;
+        return position;
     }
 
     public int distance(Part to)

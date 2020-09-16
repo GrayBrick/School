@@ -4,37 +4,62 @@ import java.util.List;
 
 public class algoritm {
 
-    public static ArrayList<ArrayList<Part>>  field = new ArrayList<>();
+    public static ArrayList<ArrayList<Part>>    field = new ArrayList<>();
+    public static byte                          build_type = 0;
+    public static byte                          type_algo = 0;      //0 = A_star
+                                                                    //1 = волной
+                                                                    //2 = жадный поиск
+    public static byte                          type_output = 0;    //0 = просто выводит финальное решение если оно есть
+                                                                    //1 = выводит каждый шаг
+                                                                    //2 = выводит поиск путей
+    public static boolean                       show_color = false;
 
     public static void main(String[] args)
     {
-        Date d1 = new Date();
-        for (int i1 = 0; i1 < 1; i1++) {
-            field = new ArrayList<>();
-            List<Integer> list_value = new ArrayList<>();
-
-            int size = 50;
-            fill_field_random(list_value, size);
-
-            for (int i = 1; i < size * size; i++)
-            {
-                if (i == (size * size) - 1 && Part.get_part(i).get_final_position().equals(Part.get_part(i).position))
-                {
-                    Part.get_part(i).block = true;
-                    break ;
-                }
-                if (Part.get_part(i).block)
-                    continue ;
-                if (Part.get_part(Part.get_part(i).get_final_position()).isSpecial())
-                    solve_special_part(Part.get_part(i), Part.get_part(i).get_final_position());
-                else
-                    move_from_to(Part.get_part(i), Part.get_part(i).get_final_position(), true);
-            }
-            print_field();
-            System.out.println("Всего передвижений: " + Part.all_move);
+        for (int i = 0; i < 200; i++)
+        {
+            solve((int) (Math.random() * 50));
         }
+    }
+
+    public static void solve(int size)
+    {
+        Date d1 = new Date();
+        field = new ArrayList<>();
+        List<Integer> list_value = new ArrayList<>();
+
+        build_type = 1;
+        type_algo = 2;
+        type_output = 0;
+        show_color = true;
+
+        fill_field_random(list_value, size);
+
+        if (!isCollect())
+        {
+            System.out.println("не соберется");
+            return ;
+        }
+
+
+        for (int i = 1; i < size * size; i++)
+        {
+            if (i == (size * size) - 1 && Part.get_part(i).get_final_position().equals(Part.get_part(i).position))
+            {
+                Part.get_part(i).block = true;
+                break ;
+            }
+            if (Part.get_part(i).block)
+                continue ;
+            if (Part.get_part(Part.get_part(i).get_final_position()).isSpecial())
+                solve_special_part(Part.get_part(i), Part.get_part(i).get_final_position());
+            else
+                move_from_to(Part.get_part(i), Part.get_part(i).get_final_position(), true);
+        }
+        print_field();
+        System.out.println("Всего передвижений: " + Part.all_move);
         Date d2 = new Date();
-        System.out.println("\n\n" + (d2.getTime() - d1.getTime()));
+        System.out.println("Времени затрачено: " + (d2.getTime() - d1.getTime()) + " mc");
     }
 
     public static boolean solve_special_part(Part from, int[] position)
@@ -51,11 +76,11 @@ public class algoritm {
         if (!move_from_to(next, position, false))
             return false;
         next.move = true;
-        to = getFirstCounterClockWise(next);
+        to = build_type == 0 ? getFirstCounterClockWise(next) : getFirstClockWise(next);
         if (!move_from_to(from, to.position, false))
             return false;
         from.move = true;
-        to = getFirstClockWise(next);
+        to = build_type == 0 ? getFirstClockWise(next) : getFirstCounterClockWise(next);
         if (!move_from_to(next, to.position, true))
             return false;
         from.move();
@@ -221,38 +246,75 @@ public class algoritm {
                 field_str += "\n";
             for (Part part : part_list)
             {
-                if (part.block)
-                    field_str += ChatColor.WHITE_BRIGHT + ChatColor.RED_BACKGROUND +
-                            (part.value < 1000 ? (part.value < 100 ? (part.value < 10 ? ("   " + part.value) : ("  " + part.value)) : " " + part.value) : part.value)
-                            + " " + ChatColor.RESET;
-                else
-                if (part.move)
+                if (algoritm.show_color)
                 {
-                    field_str += ChatColor.WHITE_BRIGHT + ChatColor.YELLOW_BACKGROUND +
-                            (part.value < 1000 ? (part.value < 100 ? (part.value < 10 ? ("   " + part.value) : ("  " + part.value)) : " " + part.value) : part.value)
-                            + " " + ChatColor.RESET;
+                    if (part.block)
+                        field_str += ChatColor.WHITE_BRIGHT + ChatColor.RED_BACKGROUND +
+                                (part.value < 1000 ? (part.value < 100 ? (part.value < 10 ? ("   " + part.value) : ("  " + part.value)) : " " + part.value) : part.value)
+                                + " " + ChatColor.RESET;
+                    else if (part.move)
+                    {
+                        field_str += ChatColor.WHITE_BRIGHT + ChatColor.YELLOW_BACKGROUND +
+                                (part.value < 1000 ? (part.value < 100 ? (part.value < 10 ? ("   " + part.value) : ("  " + part.value)) : " " + part.value) : part.value)
+                                + " " + ChatColor.RESET;
+                    }
+                    else if (part.value == 0)
+                    {
+                        field_str += ChatColor.WHITE_BRIGHT + ChatColor.CYAN_BACKGROUND +
+                                (part.value < 1000 ? (part.value < 100 ? (part.value < 10 ? ("   " + part.value) : ("  " + part.value)) : " " + part.value) : part.value)
+                                + " " + ChatColor.RESET;
+                    }
+                    else if (part.open)
+                        field_str += ChatColor.WHITE_BRIGHT + ChatColor.GREEN_BACKGROUND +
+                                (part.value < 1000 ? (part.value < 100 ? (part.value < 10 ? ("   " + part.value) : ("  " + part.value)) : " " + part.value) : part.value)
+                                + " " + ChatColor.RESET;
+                    else if (part.close)
+                        field_str += ChatColor.WHITE_BRIGHT + ChatColor.BLACK_BACKGROUND +
+                                (part.value < 1000 ? (part.value < 100 ? (part.value < 10 ? ("   " + part.value) : ("  " + part.value)) : " " + part.value) : part.value)
+                                + " " + ChatColor.RESET;
+                    else
+                        field_str += (part.value < 1000 ? (part.value < 100 ? (part.value < 10 ? ("   " + part.value) : ("  " + part.value)) : " " + part.value) : part.value) + " ";
                 }
                 else
-                if (part.value == 0)
-                {
-                    field_str += ChatColor.WHITE_BRIGHT + ChatColor.CYAN_BACKGROUND +
-                            (part.value < 1000 ? (part.value < 100 ? (part.value < 10 ? ("   " + part.value) : ("  " + part.value)) : " " + part.value) : part.value)
-                            + " " + ChatColor.RESET;
-                }
-                else if (part.open)
-                    field_str += ChatColor.WHITE_BRIGHT + ChatColor.GREEN_BACKGROUND +
-                            (part.value < 1000 ? (part.value < 100 ? (part.value < 10 ? ("   " + part.value) : ("  " + part.value)) : " " + part.value) : part.value)
-                            + " " + ChatColor.RESET;
-                else if (part.close)
-                    field_str += ChatColor.WHITE_BRIGHT + ChatColor.BLACK_BACKGROUND +
-                            (part.value < 1000 ? (part.value < 100 ? (part.value < 10 ? ("   " + part.value) : ("  " + part.value)) : " " + part.value) : part.value)
-                            + " " + ChatColor.RESET;
-                else if (!part.block)
                     field_str += (part.value < 1000 ? (part.value < 100 ? (part.value < 10 ? ("   " + part.value) : ("  " + part.value)) : " " + part.value) : part.value) + " ";
             }
         }
         field_str += "\n";
 
         System.out.print(field_str);
+    }
+
+    public static boolean isCollect()
+    {
+        byte buf = type_output;
+        type_output = 0;
+        int size = Part.size;
+        ArrayList<ArrayList<Part>> clone_field = (ArrayList<ArrayList<Part>>) field.clone();
+
+        for (int i = 1; i < size * size; i++)
+        {
+            if (i == (size * size) - 1 && Part.get_part(i).get_final_position().equals(Part.get_part(i).position))
+            {
+                Part.get_part(i).block = true;
+                break ;
+            }
+            if (Part.get_part(i).block)
+                continue ;
+            if (Part.get_part(Part.get_part(i).get_final_position()).isSpecial())
+                solve_special_part(Part.get_part(i), Part.get_part(i).get_final_position());
+            else
+                move_from_to(Part.get_part(i), Part.get_part(i).get_final_position(), true);
+        }
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                if (field.get(i).get(j).value != 0 && !field.get(i).get(j).block)
+                    return false;
+            }
+        }
+        field = clone_field;
+        type_output = buf;
+        return true;
     }
 }
