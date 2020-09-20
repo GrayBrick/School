@@ -16,9 +16,18 @@ public class algoritm {
 
     public static void main(String[] args)
     {
-        for (int i = 0; i < 200; i++)
+//        for (int i = 0; i < 200; i++)
+//        {
+//            solve((int) (Math.random() * 50));
+//        }
+        read_args(args);
+            solve(100);
+    }
+
+    public static void read_args(String[] args) {
+        for (int i = 0; i < args.length; i++)
         {
-            solve((int) (Math.random() * 50));
+
         }
     }
 
@@ -30,7 +39,7 @@ public class algoritm {
 
         build_type = 1;
         type_algo = 2;
-        type_output = 0;
+        type_output = 1;
         show_color = true;
 
         fill_field_random(list_value, size);
