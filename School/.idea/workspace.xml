@@ -25,11 +25,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2db93af2-ee0c-41d5-bc9d-19219c095eab" name="Default Changelist" comment="v 16.09">
-      <change afterPath="$PROJECT_DIR$/.idea/artifacts/u_puzzle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/School/algoritm.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/School/algoritm.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/A_star.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/A_star.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Part.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Part.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/algoritm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algoritm.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -81,7 +77,7 @@
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -99,23 +95,25 @@
       <workItem from="1599044818334" duration="1627000" />
       <workItem from="1600254495302" duration="8255000" />
       <workItem from="1600267062015" duration="1066000" />
+      <workItem from="1600596921758" duration="280000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
+    <option name="version" value="1" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="v 16.09" />

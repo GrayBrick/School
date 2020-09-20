@@ -19,10 +19,46 @@ public class A_star
             }
         }
         open_Parts.clear();
-        return algoritm.type_algo == 0 ? find_way(from, to) : algoritm.type_algo == 1 ? find_way_wave(from, to, from.value) : find_way_greedy(from, to);
+        switch (algoritm.type_algo % 3)
+        {
+            case 0:
+            {
+                try
+                {
+                    return find_way(from, to);
+                } catch(Exception ex)
+                {
+                    algoritm.type_algo++;
+                    return  start_find_way(from, to);
+                }
+            }
+            case 1:
+            {
+                try
+                {
+                    return find_way_wave(from, to, from.value);
+                } catch(Exception ex)
+                {
+                    algoritm.type_algo++;
+                    return  start_find_way(from, to);
+                }
+            }
+            case 2:
+            {
+                try
+                {
+                    return find_way_greedy(from, to);
+                } catch(Exception ex)
+                {
+                    algoritm.type_algo++;
+                    return  start_find_way(from, to);
+                }
+            }
+        }
+        return false;
     }
 
-    public static boolean find_way(Part from, Part to)
+    public static boolean find_way(Part from, Part to) throws Exception
     {
         if (from.equals(to))
             return true;
@@ -69,7 +105,7 @@ public class A_star
         return find_way(open_Parts.get(index), to);
     }
 
-    public static boolean   find_way_wave(Part from, Part to, int value)
+    public static boolean   find_way_wave(Part from, Part to, int value) throws Exception
     {
         if (from.equals(to))
             return true;
@@ -100,7 +136,7 @@ public class A_star
         return find_way_wave(open_Parts.get(0), to, value);
     }
 
-    public static boolean find_way_greedy(Part from, Part to)
+    public static boolean find_way_greedy(Part from, Part to) throws Exception
     {
         if (from.equals(to))
             return true;

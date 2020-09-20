@@ -18,7 +18,7 @@ public class algoritm {
     {
         for (int i = 0; i < 200; i++)
         {
-            solve((int) (Math.random() * 50));
+            solve(100);
         }
     }
 
