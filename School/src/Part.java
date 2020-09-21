@@ -85,16 +85,33 @@ public class Part
 
     public int[] get_final_position()
     {
-        if (value == 1)
+        if (algoritm.build_type != 2)
+        {
+            if (value == 1)
+                return new int[]{0,0};
+            if (value == 0)
+                return position;
+            Part ret_pos = algoritm.build_type == 0 ?
+                    algoritm.getFirstClockWise(
+                            Part.get_part(value - 1)
+                    ) :
+                    algoritm.getFirstCounterClockWise(
+                            Part.get_part(value - 1)
+                    );
+            if (ret_pos != null)
+                return ret_pos.position;
+            return position;
+        }
+        if (value == (size * size) - 1)
             return new int[]{0,0};
         if (value == 0)
             return position;
         Part ret_pos = algoritm.build_type == 0 ?
                 algoritm.getFirstClockWise(
-                        Part.get_part(value - 1)
+                        Part.get_part(value + 1)
                 ) :
                 algoritm.getFirstCounterClockWise(
-                        Part.get_part(value - 1)
+                        Part.get_part(value + 1)
                 );
         if (ret_pos != null)
             return ret_pos.position;
@@ -103,10 +120,29 @@ public class Part
 
     public int distance(Part to)
     {
+        if (algoritm.type_evr == 0)
+        {
+            int a = Math.abs(position[0] - to.position[0]);
+            int b = Math.abs(position[1] - to.position[1]);
+
+            return a + b;
+        }
+        else if (algoritm.type_evr == 1)
+        {
+            int a = Math.abs(position[0] - to.position[0]);
+            int b = Math.abs(position[1] - to.position[1]);
+
+            return a + b + (4 - getNear().size());
+        }
+        return distance_1(to);
+    }
+
+    public int distance_1(Part to)
+    {
         int a = Math.abs(position[0] - to.position[0]);
         int b = Math.abs(position[1] - to.position[1]);
 
-        return a + b;
+        return (int) Math.sqrt((a * a) + (b * b));
     }
 
     public static Part get_part(int value)
