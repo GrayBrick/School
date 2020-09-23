@@ -5,7 +5,10 @@ import java.util.List;
 public class algoritm {
 
     public static ArrayList<ArrayList<Part>>    field = new ArrayList<>();
-    public static byte                          build_type = 0;
+    public static byte                          build_type = 0;     //0 = по часовой
+                                                                    //1 = против
+    public static byte                          type_evr = 0;       //0 = эвристика a + b
+                                                                    //1 = по пифагору
     public static int                           size_map = 3;
     public static byte                          type_algo = 0;      //0 = A_star
                                                                     //1 = волной
@@ -85,6 +88,8 @@ public class algoritm {
         field = new ArrayList<>();
         List<Integer> list_value = new ArrayList<>();
 
+        type_evr = (byte) (Math.random() * 3);
+
         fill_field_random(list_value, size);
 
         if (!isCollect())
@@ -93,30 +98,50 @@ public class algoritm {
             return ;
         }
 
-
-        for (int i = 1; i < size * size; i++)
+        if (build_type != 2)
         {
-            if (i == (size * size) - 1 && Part.get_part(i).get_final_position().equals(Part.get_part(i).position))
+            for (int i = 1; i < size * size; i++)
             {
-                Part.get_part(i).block = true;
+                if (algos(i))
+                    continue ;
                 break ;
             }
-            if (Part.get_part(i).block)
-                continue ;
-            if (Part.get_part(Part.get_part(i).get_final_position()).isSpecial())
-                solve_special_part(Part.get_part(i), Part.get_part(i).get_final_position());
-            else
-                move_from_to(Part.get_part(i), Part.get_part(i).get_final_position(), true);
         }
+        else
+        {
+            for (int i = (size * size) - 1; i > 0; i--)
+            {
+                if (algos(i))
+                    continue ;
+                break ;
+            }
+        }
+
         print_field();
         System.out.println("Всего передвижений: " + Part.all_move);
         Date d2 = new Date();
         System.out.println("Времени затрачено: " + (d2.getTime() - d1.getTime()) + " mc");
     }
 
+    public static boolean      algos(int i)
+    {
+        if (i == (build_type != 2 ? (Part.size * Part.size) - 1 : 1) && Part.get_part(i).get_final_position().equals(Part.get_part(i).position))
+        {
+            Part.get_part(i).block = true;
+            return false;
+        }
+        if (Part.get_part(i).block)
+            return true;
+        if (Part.get_part(Part.get_part(i).get_final_position()).isSpecial())
+            solve_special_part(Part.get_part(i), Part.get_part(i).get_final_position());
+        else
+            move_from_to(Part.get_part(i), Part.get_part(i).get_final_position(), true);
+        return true;
+    }
+
     public static boolean solve_special_part(Part from, int[] position)
     {
-        Part next = Part.get_part(from.value + 1);
+        Part next = Part.get_part(from.value + (build_type == 2 ? -1 : 1));
 
         if (next == null)
             return false;
@@ -343,20 +368,25 @@ public class algoritm {
         int size = Part.size;
         ArrayList<ArrayList<Part>> clone_field = (ArrayList<ArrayList<Part>>) field.clone();
 
-        for (int i = 1; i < size * size; i++)
+        if (build_type != 2)
         {
-            if (i == (size * size) - 1 && Part.get_part(i).get_final_position().equals(Part.get_part(i).position))
+            for (int i = 1; i < size * size; i++)
             {
-                Part.get_part(i).block = true;
+                if (algos(i))
+                    continue ;
                 break ;
             }
-            if (Part.get_part(i).block)
-                continue ;
-            if (Part.get_part(Part.get_part(i).get_final_position()).isSpecial())
-                solve_special_part(Part.get_part(i), Part.get_part(i).get_final_position());
-            else
-                move_from_to(Part.get_part(i), Part.get_part(i).get_final_position(), true);
         }
+        else
+        {
+            for (int i = (size * size) - 1; i > 0; i--)
+            {
+                if (algos(i))
+                    continue ;
+                break ;
+            }
+        }
+
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
