@@ -6,6 +6,7 @@ public class algoritm {
 
     public static ArrayList<ArrayList<Part>>    field = new ArrayList<>();
     public static byte                          build_type = 0;
+    public static int                           size_map = 3;
     public static byte                          type_algo = 0;      //0 = A_star
                                                                     //1 = волной
                                                                     //2 = жадный поиск
@@ -21,14 +22,61 @@ public class algoritm {
 //            solve((int) (Math.random() * 50));
 //        }
         read_args(args);
-            solve(100);
+        solve(size_map);
     }
 
     public static void read_args(String[] args) {
-        for (int i = 0; i < args.length; i++)
-        {
-
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-h") || args[i].equals("-help")) {
+                show_help();
+            }
+            else if (args[i].equals("-c") || args[i].equals("-color")) {
+                show_color = true;
+            }
+            else if (args[i].equals("-o") || args[i].equals("-output")) {
+                type_output = parse_args(args[i], args[i + 1], 2);
+            }
+            else if (args[i].equals("-a") || args[i].equals("-alg")) {
+                type_algo = parse_args(args[i], args[i + 1], 2);
+            }
+            else if (args[i].equals("-b") || args[i].equals("-build")) {
+                build_type = parse_args(args[i], args[i + 1], 2);
+            }
+            else if (args[i].equals("-s") || args[i].equals("-size")) {
+                size_map = parse_args(args[i], args[i + 1], 150);
+            }
         }
+    }
+
+    public static byte parse_args(String flag, String arg, int max_value) {
+        if (!isOnlyDigits(arg)) {
+            System.out.print("Error: ");
+            System.out.print("only numbers!");
+            System.exit(1);
+        }
+        final byte value = (byte)Integer.parseInt(arg);
+        if (value > max_value || value < 0) {
+            System.out.print("Error: ");
+            System.out.print(flag);
+            System.out.print(" min value 0, max value ");
+            System.out.print(max_value);
+            System.exit(1);
+        }
+        return (value);
+    }
+
+    private static boolean isOnlyDigits(String str) {
+        return str.matches("[\\d]+");
+    }
+
+    public static void show_help() {
+        System.out.println("flags:");
+        System.out.println("-b, -build [0-2]: this is build type. Default value 0");
+        System.out.println("-a, -alg [0-2]: this is  type. Default value 0");
+        System.out.println("-o, -output [0-2]: this is output type Default value 0");
+        System.out.println("-s, -size [0-150]: map size (the limit 150 is set so as not to load the computer)");
+        System.out.println("-c, -color: use colors");
+        System.exit(1);
     }
 
     public static void solve(int size)
@@ -36,11 +84,6 @@ public class algoritm {
         Date d1 = new Date();
         field = new ArrayList<>();
         List<Integer> list_value = new ArrayList<>();
-
-        build_type = 1;
-        type_algo = 2;
-        type_output = 1;
-        show_color = true;
 
         fill_field_random(list_value, size);
 
