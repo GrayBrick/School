@@ -1,3 +1,7 @@
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,43 +32,59 @@ public class algoritm {
         solve(size_map);
     }
 
-    public static void read_args(String[] args) {
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-h") || args[i].equals("-help")) {
-                show_help();
+    public static String read_map(String map)
+    {
+        try (FileReader reader = new FileReader(map))
+        {
+            int c;
+            StringBuilder createMap = new StringBuilder();
+            while ((c = reader.read()) != -1)
+            {
+                if (Character.isDigit(c))
+                    createMap.append((char) c + ' ');
+                else if (c == '\n')
+                    createMap.append(c);
+                else if (!Character.isSpace((char) c))
+                    error_message("map must contain only numbers!");
+                System.out.print((char) c);
             }
-            else if (args[i].equals("-c") || args[i].equals("-color")) {
-                show_color = true;
-            }
-            else if (args[i].equals("-o") || args[i].equals("-output")) {
-                type_output = parse_args(args[i], args[i + 1], 2);
-            }
-            else if (args[i].equals("-a") || args[i].equals("-alg")) {
-                type_algo = parse_args(args[i], args[i + 1], 2);
-            }
-            else if (args[i].equals("-b") || args[i].equals("-build")) {
-                build_type = parse_args(args[i], args[i + 1], 2);
-            }
-            else if (args[i].equals("-s") || args[i].equals("-size")) {
-                size_map = parse_args(args[i], args[i + 1], 150);
+            return (createMap.toString());
+        }
+        catch (IOException ex) {error_message(ex.getMessage());}
+        return ("");
+    }
+
+    public static void read_args(String[] args)
+    {
+        for (int i = 0; i < args.length; i++)
+        {
+            switch (args[i])
+            {
+                case "-h", "-help" -> show_help();
+                case "-c", "-color" -> show_color = true;
+                case "-o", "-output" -> type_output = parse_args(args[i], args[i + 1], 2);
+                case "-a", "-alg" -> type_algo = parse_args(args[i], args[i + 1], 2);
+                case "-b", "-build" -> build_type = parse_args(args[i], args[i + 1], 2);
+                case "-s", "-size" -> size_map = parse_args(args[i], args[i + 1], 150);
+                case "-m", "-map" -> read_map(args[i + 1]);
             }
         }
     }
 
-    public static byte parse_args(String flag, String arg, int max_value) {
-        if (!isOnlyDigits(arg)) {
-            System.out.print("Error: ");
-            System.out.print("only numbers!");
-            System.exit(1);
-        }
+    public static void error_message(String message)
+    {
+        System.out.print("Error: ");
+        System.out.println(message);
+        System.exit(1);
+    }
+
+    public static byte parse_args(String flag, String arg, int max_value)
+    {
+        if (!isOnlyDigits(arg))
+            error_message("only numbers!");
         final byte value = (byte)Integer.parseInt(arg);
-        if (value > max_value || value < 0) {
-            System.out.print("Error: ");
-            System.out.print(flag);
-            System.out.print(" min value 0, max value ");
-            System.out.print(max_value);
-            System.exit(1);
-        }
+        if (value > max_value || value < 0)
+            error_message(flag + " min value 0, max value " + max_value);
         return (value);
     }
 
@@ -99,23 +119,19 @@ public class algoritm {
         }
 
         if (build_type != 2)
-        {
             for (int i = 1; i < size * size; i++)
             {
                 if (algos(i))
                     continue ;
                 break ;
             }
-        }
         else
-        {
             for (int i = (size * size) - 1; i > 0; i--)
             {
                 if (algos(i))
                     continue ;
                 break ;
             }
-        }
 
         print_field();
         System.out.println("Всего передвижений: " + Part.all_move);
@@ -123,9 +139,10 @@ public class algoritm {
         System.out.println("Времени затрачено: " + (d2.getTime() - d1.getTime()) + " mc");
     }
 
-    public static boolean      algos(int i)
+    public static boolean algos(int i)
     {
-        if (i == (build_type != 2 ? (Part.size * Part.size) - 1 : 1) && Part.get_part(i).get_final_position().equals(Part.get_part(i).position))
+        if (i == (build_type != 2 ? (Part.size * Part.size) - 1 : 1) &&
+           Part.get_part(i).get_final_position().equals(Part.get_part(i).position))
         {
             Part.get_part(i).block = true;
             return false;
