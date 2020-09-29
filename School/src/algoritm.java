@@ -24,10 +24,6 @@ public class algoritm {
 
     public static void main(String[] args)
     {
-//        for (int i = 0; i < 200; i++)
-//        {
-//            solve((int) (Math.random() * 50));
-//        }
         read_args(args);
         solve(size_map);
     }
@@ -116,6 +112,12 @@ public class algoritm {
 
         fill_field_random(list_value, size);
 
+        if (!no_rep())
+        {
+            System.out.println("Элементы повторяются или их недостаточно");
+            return ;
+        }
+
         if (!isCollect())
         {
             System.out.println("не соберется");
@@ -141,6 +143,24 @@ public class algoritm {
         System.out.println("Всего передвижений: " + Part.all_move);
         Date d2 = new Date();
         System.out.println("Времени затрачено: " + (d2.getTime() - d1.getTime()) + " mc");
+    }
+
+    public static boolean no_rep()
+    {
+        ArrayList<Integer> values = new ArrayList<Integer>();
+
+        for (ArrayList<Part> parts : field)
+        {
+            for (Part part : parts)
+            {
+                if (values.contains(part.value))
+                    return false;
+                values.add(part.value);
+            }
+        }
+        if (values.size() != Math.pow(size_map, 2))
+            return false;
+        return true;
     }
 
     public static boolean algos(int i)
