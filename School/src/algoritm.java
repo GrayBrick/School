@@ -58,16 +58,20 @@ public class algoritm {
     {
         for (int i = 0; i < args.length; i++)
         {
-            switch (args[i])
-            {
-                case "-h", "-help" -> show_help();
-                case "-c", "-color" -> show_color = true;
-                case "-o", "-output" -> type_output = parse_args(args[i], args[i + 1], 2);
-                case "-a", "-alg" -> type_algo = parse_args(args[i], args[i + 1], 2);
-                case "-b", "-build" -> build_type = parse_args(args[i], args[i + 1], 2);
-                case "-s", "-size" -> size_map = parse_args(args[i], args[i + 1], 150);
-                case "-m", "-map" -> read_map(args[i + 1]);
-            }
+            if (args[i].equals("-h") || args[i].equals("-help"))
+                show_help();
+            else if (args[i].equals("-c") || args[i].equals("-color"))
+                show_color = true;
+            else if (args[i].equals("-o") || args[i].equals("-output"))
+                type_output = parse_args(args[i], args[i + 1], 2);
+            else if (args[i].equals("-a") || args[i].equals("-alg"))
+                type_algo = parse_args(args[i], args[i + 1], 2);
+            else if (args[i].equals("-b") || args[i].equals("-build"))
+                build_type = parse_args(args[i], args[i + 1], 2);
+            else if (args[i].equals("-s") || args[i].equals("-size"))
+                size_map = parse_args(args[i], args[i + 1], 150);
+            else if (args[i].equals("-m") || args[i].equals("-map"))
+                read_map(args[i + 1]);
         }
     }
 
