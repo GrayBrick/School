@@ -28,19 +28,46 @@ public class algoritm {
         solve(size_map);
     }
 
-    public static String read_map(String map)
-    {
+    public static int get_size_map(String map) {
         try (FileReader reader = new FileReader(map))
         {
             int c;
+            String getSize;
+            StringBuilder readSize = new StringBuilder();
+            while ((c = reader.read()) != -1)
+            {
+                if (c == '\n')
+                    break;
+                readSize.append((char)c);
+            }
+            getSize = readSize.toString();
+            if (!isOnlyDigits(getSize))
+                error_message("invalid map size!");
+            return (Integer.parseInt(getSize));
+        }
+        catch (IOException ex) {error_message(ex.getMessage());}
+        return (-1);
+    }
+
+    public static String read_map(String map)
+    {
+        size_map = get_size_map(map);
+        try (FileReader reader = new FileReader(map))
+        {
+            int c;
+            boolean comment = false;
             StringBuilder createMap = new StringBuilder();
             while ((c = reader.read()) != -1)
             {
-                if (Character.isDigit(c))
-                    createMap.append((char) c + ' ');
-                else if (c == '\n')
+                if (c == '#')
+                    comment = true;
+                else if (c == '\n') {
+                    comment = false;
                     createMap.append(c);
-                else if (!Character.isSpace((char) c))
+                }
+                else if (Character.isDigit(c) && !comment)
+                    createMap.append((char) c + ' ');
+                else if (!Character.isSpace((char) c) && !comment)
                     error_message("map must contain only numbers!");
                 System.out.print((char) c);
             }
@@ -66,6 +93,8 @@ public class algoritm {
                 build_type = parse_args(args[i], args[i + 1], 2);
             else if (args[i].equals("-s") || args[i].equals("-size"))
                 size_map = parse_args(args[i], args[i + 1], 150);
+            else if (args[i].equals("-e"))
+                type_evr = parse_args(args[i], args[i + 1], 2);
             else if (args[i].equals("-m") || args[i].equals("-map"))
                 read_map(args[i + 1]);
         }
@@ -110,7 +139,8 @@ public class algoritm {
 
         type_evr = (byte) (Math.random() * 3);
 
-        fill_field_random(list_value, size);
+        if (field.size() == 0)
+            fill_field_random(list_value, size);
 
         if (!no_rep())
         {
