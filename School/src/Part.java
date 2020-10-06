@@ -62,7 +62,8 @@ public class Part
         int[] buf = this.position;
         this.position = zero.position;
         zero.position = buf;
-        all_move++;
+        if (!algoritm.run_collect)
+            all_move++;
         if (algoritm.type_output != 0)
             algoritm.print_field();
         return true;

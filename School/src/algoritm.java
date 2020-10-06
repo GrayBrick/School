@@ -1,3 +1,5 @@
+import com.sun.javafx.binding.StringFormatter;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,15 +13,18 @@ public class algoritm {
     public static byte                          build_type = 0;     //0 = по часовой
                                                                     //1 = против
     public static byte                          type_evr = 0;       //0 = эвристика a + b
-                                                                    //1 = по пифагору
+                                                                    //1 = выбирает путь ближе к стенке
+                                                                    //2 = по пифагору
     public static int                           size_map = 3;
     public static byte                          type_algo = 0;      //0 = A_star
                                                                     //1 = волной
                                                                     //2 = жадный поиск
-    public static byte                          type_output = 1;    //0 = просто выводит финальное решение если оно есть
+    public static byte                          type_output = 0;    //0 = просто выводит финальное решение если оно есть
                                                                     //1 = выводит каждый шаг
                                                                     //2 = выводит поиск путей
     public static boolean                       show_color = false;
+
+    public static boolean                       run_collect = true;
 
     public static void main(String[] args)
     {
@@ -42,15 +47,18 @@ public class algoritm {
             error_message("invalid map!");
     }
 
-    public static void read_map_size(String line) {
+    public static boolean read_map_size(String line) {
         if (line == null)
             error_message("invalid map!");
         line = line.split("#")[0].trim();
+        if (line.length() == 0)
+            return true;
         size_map = Integer.parseInt(line);
         if (!isOnlyDigits(line))
             error_message("invalid size map!");
         if (size_map < 0)
             error_message("negative size map!");
+        return false;
     }
 
     public static boolean read_map(String map) {
@@ -59,7 +67,8 @@ public class algoritm {
             String line;
             BufferedReader bufferReader = new BufferedReader(reader);
             List<String> stack = new ArrayList<>();
-            read_map_size(bufferReader.readLine());
+            while(read_map_size(bufferReader.readLine()))
+                continue;
             while ((line = bufferReader.readLine()) != null)
             {
                 check_map_line(line);
@@ -87,7 +96,7 @@ public class algoritm {
                 type_algo = parse_args(args[i], args[i + 1], 2);
             else if (args[i].equals("-b") || args[i].equals("-build"))
                 build_type = parse_args(args[i], args[i + 1], 2);
-            else if (args[i].equals("-s") || args[i].equals("-size"))
+            else if ((args[i].equals("-s") || args[i].equals("-size")) && field.size() == 0)
                 size_map = parse_args(args[i], args[i + 1], 150);
             else if (args[i].equals("-e"))
                 type_evr = parse_args(args[i], args[i + 1], 2);
@@ -133,8 +142,6 @@ public class algoritm {
         Date d1 = new Date();
         List<Integer> list_value = new ArrayList<>();
 
-        type_evr = (byte) (Math.random() * 3);
-
         if (field.size() != size_map && field.size() == 0)
             fill_field_random(list_value, size);
 
@@ -149,6 +156,7 @@ public class algoritm {
             System.out.println("не соберется");
             return ;
         }
+        run_collect = false;
 
         if (build_type != 2)
             for (int i = 1; i < size * size; i++)
@@ -200,7 +208,16 @@ public class algoritm {
         if (Part.get_part(i).block)
             return true;
         if (Part.get_part(Part.get_part(i).get_final_position()).isSpecial())
+        {
+            if (Part.get_part(i).position == Part.get_part(i).get_final_position() &&
+                Part.get_part(i + 1).position == Part.get_part(i + 1).get_final_position())
+            {
+                Part.get_part(i).block = true;
+                Part.get_part(i + 1).block = true;
+                return true;
+            }
             solve_special_part(Part.get_part(i), Part.get_part(i).get_final_position());
+        }
         else
             move_from_to(Part.get_part(i), Part.get_part(i).get_final_position(), true);
         return true;
@@ -381,7 +398,7 @@ public class algoritm {
                 try
                 {
                     int value_int = Integer.parseInt(value);
-                    field.get(i).add(new Part(value_int, new int[]{i, j}));
+                    field.get(i).add(new Part(value_int, new int[]{i, j++}));
                 } catch(Exception ex){continue;}
             }
             i++;
@@ -452,12 +469,28 @@ public class algoritm {
         System.out.print(field_str);
     }
 
+    public static ArrayList<ArrayList<Part>> clone_field()
+    {
+        ArrayList<ArrayList<Part>>  clone_field = new ArrayList<>();
+
+        for (int i = 0; i < algoritm.field.size(); i++)
+        {
+            clone_field.add(new ArrayList<>());
+            for (int j = 0; j < algoritm.field.get(i).size(); j++)
+            {
+                clone_field.get(i).add(new Part(field.get(i).get(j).value, field.get(i).get(j).position));
+            }
+        }
+
+        return clone_field;
+    }
+
     public static boolean isCollect()
     {
         byte buf = type_output;
-        //type_output = 0;
+        type_output = 0;
         int size = Part.size;
-        ArrayList<ArrayList<Part>> clone_field = (ArrayList<ArrayList<Part>>) field.clone();
+        ArrayList<ArrayList<Part>> clone_field = clone_field();
 
         if (build_type != 2)
         {
@@ -487,7 +520,7 @@ public class algoritm {
             }
         }
         field = clone_field;
-        //type_output = buf;
+        type_output = buf;
         return true;
     }
 }
