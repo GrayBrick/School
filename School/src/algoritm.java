@@ -1,5 +1,4 @@
-
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ public class algoritm {
     public static byte                          type_algo = 0;      //0 = A_star
                                                                     //1 = волной
                                                                     //2 = жадный поиск
-    public static byte                          type_output = 0;    //0 = просто выводит финальное решение если оно есть
+    public static byte                          type_output = 1;    //0 = просто выводит финальное решение если оно есть
                                                                     //1 = выводит каждый шаг
                                                                     //2 = выводит поиск путей
     public static boolean                       show_color = false;
@@ -28,53 +27,50 @@ public class algoritm {
         solve(size_map);
     }
 
-    public static int get_size_map(String map) {
-        try (FileReader reader = new FileReader(map))
-        {
-            int c;
-            String getSize;
-            StringBuilder readSize = new StringBuilder();
-            while ((c = reader.read()) != -1)
-            {
-                if (c == '\n')
-                    break;
-                readSize.append((char)c);
-            }
-            getSize = readSize.toString();
-            if (!isOnlyDigits(getSize))
-                error_message("invalid map size!");
-            return (Integer.parseInt(getSize));
+    public static void check_map_line(String line) {
+        int count = 0;
+        line = line.split("#")[0].trim();
+        String[] parseLine = line.split(" ");
+        for (int i = 0; i < parseLine.length; i++) {
+            if (parseLine[i].length() == 0)
+                continue;
+            if (!isOnlyDigits(parseLine[i]))
+                error_message("only numbers!");
+            count++;
         }
-        catch (IOException ex) {error_message(ex.getMessage());}
-        return (-1);
+        if (count != size_map)
+            error_message("invalid map!");
     }
 
-    public static String read_map(String map)
-    {
-        size_map = get_size_map(map);
+    public static void read_map_size(String line) {
+        if (line == null)
+            error_message("invalid map!");
+        line = line.split("#")[0].trim();
+        size_map = Integer.parseInt(line);
+        if (!isOnlyDigits(line))
+            error_message("invalid size map!");
+        if (size_map < 0)
+            error_message("negative size map!");
+    }
+
+    public static boolean read_map(String map) {
         try (FileReader reader = new FileReader(map))
         {
-            int c;
-            boolean comment = false;
-            StringBuilder createMap = new StringBuilder();
-            while ((c = reader.read()) != -1)
+            String line;
+            BufferedReader bufferReader = new BufferedReader(reader);
+            List<String> stack = new ArrayList<>();
+            read_map_size(bufferReader.readLine());
+            while ((line = bufferReader.readLine()) != null)
             {
-                if (c == '#')
-                    comment = true;
-                else if (c == '\n') {
-                    comment = false;
-                    createMap.append(c);
-                }
-                else if (Character.isDigit(c) && !comment)
-                    createMap.append((char) c + ' ');
-                else if (!Character.isSpace((char) c) && !comment)
-                    error_message("map must contain only numbers!");
-                System.out.print((char) c);
+                check_map_line(line);
+                stack.add(line);
             }
-            return (createMap.toString());
+            if (stack.size() != size_map)
+                error_message("invalid map!");
+            return fill_field(stack);
         }
         catch (IOException ex) {error_message(ex.getMessage());}
-        return ("");
+        return false;
     }
 
     public static void read_args(String[] args)
@@ -96,13 +92,14 @@ public class algoritm {
             else if (args[i].equals("-e"))
                 type_evr = parse_args(args[i], args[i + 1], 2);
             else if (args[i].equals("-m") || args[i].equals("-map"))
-                read_map(args[i + 1]);
+                if (!read_map(args[i + 1]))
+                    error_message("something went wrong");
         }
     }
 
     public static void error_message(String message)
     {
-        System.out.print("Error: ");
+        System.out.print(ChatColor.RED + "Error: ");
         System.out.println(message);
         System.exit(1);
     }
@@ -134,12 +131,11 @@ public class algoritm {
     public static void solve(int size)
     {
         Date d1 = new Date();
-        field = new ArrayList<>();
         List<Integer> list_value = new ArrayList<>();
 
         type_evr = (byte) (Math.random() * 3);
 
-        if (field.size() == 0)
+        if (field.size() != size_map && field.size() == 0)
             fill_field_random(list_value, size);
 
         if (!no_rep())
@@ -369,6 +365,30 @@ public class algoritm {
         }
     }
 
+    public static boolean fill_field(List<String> map)
+    {
+        Part.set_size(size_map);
+
+        int i = 0;
+        int j;
+        for (String line : map)
+        {
+            String []values = line.split(" ");
+            field.add(new ArrayList<>());
+            j = 0;
+            for (String value : values)
+            {
+                try
+                {
+                    int value_int = Integer.parseInt(value);
+                    field.get(i).add(new Part(value_int, new int[]{i, j}));
+                } catch(Exception ex){continue;}
+            }
+            i++;
+        }
+        return true;
+    }
+
     public static int get_rand_value(List<Integer> list_value, int size)
     {
         int ret;
@@ -435,7 +455,7 @@ public class algoritm {
     public static boolean isCollect()
     {
         byte buf = type_output;
-        type_output = 0;
+        //type_output = 0;
         int size = Part.size;
         ArrayList<ArrayList<Part>> clone_field = (ArrayList<ArrayList<Part>>) field.clone();
 
@@ -467,7 +487,7 @@ public class algoritm {
             }
         }
         field = clone_field;
-        type_output = buf;
+        //type_output = buf;
         return true;
     }
 }
