@@ -1,5 +1,3 @@
-import com.sun.javafx.binding.StringFormatter;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -181,7 +179,7 @@ public class algoritm {
 
     public static boolean no_rep()
     {
-        ArrayList<Integer> values = new ArrayList<Integer>();
+        ArrayList<Integer> values = new ArrayList<>();
 
         for (ArrayList<Part> parts : field)
         {
@@ -199,11 +197,23 @@ public class algoritm {
 
     public static boolean algos(int i)
     {
-        if (i == (build_type != 2 ? (Part.size * Part.size) - 1 : 1) &&
-           Part.get_part(i).get_final_position().equals(Part.get_part(i).position))
+        if (i == (build_type != 2 ? (Part.size * Part.size) - 1 : 1))
         {
-            Part.get_part(i).block = true;
-            return false;
+            if (Part.get_part(i).get_final_position().equals(Part.get_part(i).position))
+            {
+                Part.get_part(i).block = true;
+                return false;
+            }
+            else
+            {
+                Part.get_part(i).move();
+                if (Part.get_part(i).position.equals(Part.get_part(i).get_final_position()))
+                {
+                    Part.get_part(i).block = true;
+                    return true;
+                }
+                return false;
+            }
         }
         if (Part.get_part(i).block)
             return true;
@@ -238,7 +248,7 @@ public class algoritm {
             return false;
         next.move = true;
         to = build_type == 0 ? getFirstCounterClockWise(next) : getFirstClockWise(next);
-        if (!move_from_to(from, to.position, false))
+        if (to == null || !move_from_to(from, to.position, false))
             return false;
         from.move = true;
         to = build_type == 0 ? getFirstClockWise(next) : getFirstCounterClockWise(next);
@@ -329,10 +339,7 @@ public class algoritm {
         {
             for (Part part : parts)
             {
-                if (part.block ||
-                        part.value == value_a ||
-                        part.value == value_b ||
-                        part.value == 0)
+                if (part.block)
                     continue ;
                 if (value == -1)
                     value = part.value;
