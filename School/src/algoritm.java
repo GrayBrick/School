@@ -89,18 +89,21 @@ public class algoritm {
             else if (args[i].equals("-c") || args[i].equals("-color"))
                 show_color = true;
             else if (args[i].equals("-o") || args[i].equals("-output"))
-                type_output = parse_args(args[i], args[i + 1], 2);
+                type_output = (byte)parse_args(args[i], args[i + 1], 2);
             else if (args[i].equals("-a") || args[i].equals("-alg"))
-                type_algo = parse_args(args[i], args[i + 1], 2);
+                type_algo = (byte)parse_args(args[i], args[i + 1], 2);
             else if (args[i].equals("-b") || args[i].equals("-build"))
-                build_type = parse_args(args[i], args[i + 1], 2);
+                build_type = (byte)parse_args(args[i], args[i + 1], 2);
             else if ((args[i].equals("-s") || args[i].equals("-size")) && field.size() == 0)
                 size_map = parse_args(args[i], args[i + 1], 150);
             else if (args[i].equals("-e"))
-                type_evr = parse_args(args[i], args[i + 1], 2);
-            else if (args[i].equals("-m") || args[i].equals("-map"))
+                type_evr = (byte)parse_args(args[i], args[i + 1], 2);
+            else if (args[i].equals("-m") || args[i].equals("-map")) {
                 if (!read_map(args[i + 1]))
                     error_message("something went wrong");
+            }
+            else
+                error_message("unknown flag, use -h");
         }
     }
 
@@ -111,11 +114,11 @@ public class algoritm {
         System.exit(1);
     }
 
-    public static byte parse_args(String flag, String arg, int max_value)
+    public static int parse_args(String flag, String arg, int max_value)
     {
         if (!isOnlyDigits(arg))
             error_message("only numbers!");
-        final byte value = (byte)Integer.parseInt(arg);
+        final int value = (int)Integer.parseInt(arg);
         if (value > max_value || value < 0)
             error_message(flag + " min value 0, max value " + max_value);
         return (value);
@@ -128,10 +131,20 @@ public class algoritm {
     public static void show_help() {
         System.out.println("flags:");
         System.out.println("-b, -build [0-2]: this is build type. Default value 0");
-        System.out.println("-a, -alg [0-2]: this is  type. Default value 0");
+        System.out.println("\t 0: default build");
+        System.out.println("\t 1: build clockwise");
+        System.out.println("\t 2: build counterclockwise");
+        System.out.println("-a, -alg [0-2]: this is algorithm type. Default value 0");
+        System.out.println("\t 0: A Star");
+        System.out.println("\t 1: BFS");
+        System.out.println("\t 2: greedy algorithm");
         System.out.println("-o, -output [0-2]: this is output type Default value 0");
+        System.out.println("\t 0: without output");
+        System.out.println("\t 1: output each step");
+        System.out.println("\t 2: output searching process");
         System.out.println("-s, -size [0-150]: map size (the limit 150 is set so as not to load the computer)");
         System.out.println("-c, -color: use colors");
+        System.out.println("-m, -map [path]: use map");
         System.exit(1);
     }
 
