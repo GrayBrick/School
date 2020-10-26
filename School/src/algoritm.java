@@ -86,20 +86,24 @@ public class algoritm {
         {
             if (args[i].equals("-h") || args[i].equals("-help"))
                 show_help();
-            else if (args[i].equals("-c") || args[i].equals("-color"))
+            else if (args[i].equals("-c") || args[i].equals("-color")) {
                 show_color = true;
+                continue;
+            }
+            else if (args.length < i + 2)
+                error_message("empty value");
             else if (args[i].equals("-o") || args[i].equals("-output"))
-                type_output = (byte)parse_args(args[i], args[i + 1], 2);
+                type_output = (byte)parse_args(args[i], args[++i], 2);
             else if (args[i].equals("-a") || args[i].equals("-alg"))
-                type_algo = (byte)parse_args(args[i], args[i + 1], 2);
+                type_algo = (byte)parse_args(args[i], args[++i], 2);
             else if (args[i].equals("-b") || args[i].equals("-build"))
-                build_type = (byte)parse_args(args[i], args[i + 1], 2);
+                build_type = (byte)parse_args(args[i], args[++i], 2);
             else if ((args[i].equals("-s") || args[i].equals("-size")) && field.size() == 0)
-                size_map = parse_args(args[i], args[i + 1], 150);
+                size_map = parse_args(args[i], args[++i], 150);
             else if (args[i].equals("-e"))
-                type_evr = (byte)parse_args(args[i], args[i + 1], 2);
+                type_evr = (byte)parse_args(args[i], args[++i], 2);
             else if (args[i].equals("-m") || args[i].equals("-map")) {
-                if (!read_map(args[i + 1]))
+                if (!read_map(args[++i]))
                     error_message("something went wrong");
             }
             else
